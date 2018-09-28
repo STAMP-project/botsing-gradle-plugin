@@ -1,0 +1,35 @@
+
+repositories{
+    mavenCentral()
+}
+
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: eu.stamp_project.evocrash.EvocrashPlugin
+dependencies {
+    compile gradleApi()
+}
+
+evocrash {
+    if(project.hasProperty("greeter")){
+        greeter = project.greeter
+    }
+    else{
+        greeter = "default user"
+    }
+    message = "it is working"
+}
+
+//ext.greeting = project.hasProperty('greeting') ? project.getProperty('greeting') : 'hello'
+
+
+
+
+
+
+
+
+
+
+
+

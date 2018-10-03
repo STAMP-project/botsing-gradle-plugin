@@ -11,8 +11,9 @@ public class EvocrashPlugin implements Plugin<Project> {
 	    EvocrashPluginExtension extension = project.getExtensions().create("evocrash", EvocrashPluginExtension.class);
 
 	    project.task("evocrash").doLast(task -> {
-		    System.out.println("Hello, " + extension.getGreeter());
-		    System.out.println("I have a message for you: " + extension.getMessage()); }
-		);
+			System.out.println("Project libraries will be taken in the directory: "+extension.getLibs());
+            System.out.println("The log file: "+extension.getLog() +" will be taken");
+            System.out.println("The test will be generated in the directory: "+extension.getTest());
+	    });
 	}
 }

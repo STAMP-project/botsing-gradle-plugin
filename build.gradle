@@ -1,15 +1,32 @@
 project.version = '1.0.0-SNAPSHOT'
 
-repositories{
+repositories {
+    if (project.hasProperty('local')) {
+        mavenLocal()
+    }
+    jcenter()
     mavenCentral()
+}
+
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "com.github.jengelman.gradle.plugins:shadow:4.0.1"
+    }
 }
 
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'java-gradle-plugin'
+apply plugin: "com.github.johnrengelman.shadow"
 
 dependencies {
-    compile gradleApi()
+    compile files('evocrash-lib/evocrash-1.0.0.jar')
+    compile group: 'org.projectlombok', name: 'lombok', version: '1.18.2'
 }
 
 gradlePlugin {
@@ -19,6 +36,11 @@ gradlePlugin {
             implementationClass = 'eu.stamp_project.evocrash.EvocrashPlugin'
         }
     }
+}
+
+shadowJar {
+    zip64 true
+    classifier = null
 }
 
 

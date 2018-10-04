@@ -27,69 +27,84 @@ import net.jcip.annotations.NotThreadSafe;
 public class EvocrashPluginExtension {
 
     @Getter @Setter
-    private String libs = "build/libs/";
+    private String test="src/GGA-tests/java/";
     @Getter @Setter
-    private String log = "logs/test.log";
+    private String log="src/resources/logs/Activeeon/8.1.0/SpaceNotFoundException.log";
     @Getter @Setter
-    private String test = ".";
+    private String libs="src/resources/targetedSoftware/Activeeon-bins/8.1.0/dist/lib/";
 
+    private String frameLevel="3";
+    private String exceptionType="org.objectweb.proactive.extensions.dataspaces.exceptions.SpaceNotFoundException";
 
-    private static final String CONFIG_PATH = "src/resources/config.properties";
-
-    private Properties properties;
+    private String criterion="CRASH";
+    private String sandbox="TRUE";
+    private String testRandom="0";
+    private String functionalMockingP="0.8";
+    private String functionalMockingPercent="0.5";
+    private String minimize="TRUE";
+    private String headlessChickenTest="FALSE";
+    private String population="80";
+    private String searchBudget="600";
+    private String conditionStopping="";
+    private String timeoutGlobal="3600";
+    private String virtualFs="TRUE";
+    private String classLoaderSeparate="FALSE";
+    private String callsReplace="FALSE";
+    private String recursionMax="50";
+    private String jarToolsLocation="";
+    private String fieldsStaticReset="FALSE";
+    private String netVirtual="FALSE";
 
     private List<String> commands;
 
     public EvocrashPluginExtension(){
-        loadProperties();
         commands = new ArrayList<>();
+    }
+
+    public void listProperties(){
+
+        System.out.println("Project libraries will be taken in the directory: "+ libs);
+        System.out.println("The log file: "+ log +" will be taken");
+        System.out.println("The test will be generated in the directory: " + test );
     }
 
     public void create() {
 
-        String testPath = properties.getProperty("path.test");
-        String libsPath = properties.getProperty("path.libs");
-        String logPath = properties.getProperty("path.log");
-
-        checkIfDirectoryExists(testPath);
-        checkIfDirectoryExists(libsPath);
-        checkIfDirectoryExists(logPath);
+        checkIfDirectoryExists(test);
+        checkIfDirectoryExists(libs);
+        checkIfDirectoryExists(log);
 
 
-        String logPaths = Paths.get(logPath).toString();
-        System.out.println("logPath: "+logPath);
-        System.out.println("logsPaths: "+logPaths);
-
+        String logPaths = Paths.get(log).toString();
 
         commands.add("-generateTests");
-        addProperty("criterion");
-        addProperty("sandbox");
-        System.out.println(testPath);
-        commands.add(String.format("-Dtest_dir=%s",Paths.get(testPath).toString()));
-        addProperty("random_tests","test.random");
-        addProperty("p_functional_mocking","functional.mocking.p");
-        addProperty("functional_mocking_percent","functional.mocking.percent");
-        addProperty("minimize");
-        addProperty("headless_chicken_test","headless.chicken.test");
-        addProperty("population");
-        addProperty("search_budget","search.budget");
-        addOptionalProperty("stopping_condition","condition.stopping");
-        addProperty("global_timeout","timeout.global");
-        addProperty("target_frame","frame.level");
-        addProperty("virtual_fs","virtual.fs");
-        addProperty("use_separate_classloader","class.loader.separate");
-        addProperty("replace_calls","calls.replace");
-        addProperty("max_recursion","recursion.max");
-        addOptionalProperty("tools_jar_location","jar.tools.location");
-        addProperty("reset_static_fields","fields.static.reset");
-        addProperty("virtual_net","net.virtual");
-        addProperty("target_exception_crash","exception.type");
+        addProperty("criterion",criterion);
+        addProperty("sandbox",sandbox);
+        commands.add(String.format("-Dtest_dir=%s",Paths.get(test).toString()));
+        addProperty("random_tests",testRandom);
+        addProperty("p_functional_mocking",functionalMockingP);
+        addProperty("functional_mocking_percent",functionalMockingPercent);
+        addProperty("minimize",minimize);
+        addProperty("headless_chicken_test",headlessChickenTest);
+        addProperty("population",population);
+        addProperty("search_budget",searchBudget);
+        addOptionalProperty("stopping_condition",conditionStopping);
+        addProperty("global_timeout",timeoutGlobal);
+        addProperty("target_frame",frameLevel);
+        addProperty("virtual_fs",virtualFs);
+        addProperty("use_separate_classloader",classLoaderSeparate);
+        addProperty("replace_calls",callsReplace);
+        addProperty("max_recursion",recursionMax);
+        addOptionalProperty("tools_jar_location",jarToolsLocation);
+        addProperty("reset_static_fields",fieldsStaticReset);
+        addProperty("virtual_net",netVirtual);
+        addProperty("target_exception_crash",exceptionType);
         commands.add(String.format("-DEXP=%s",logPaths));
 
         System.out.println(String.format("Commands used without dependencies and class: %s",commands.toString()));
 
-        commands.add(String.format("-projectCP=%s",getDependencies(libsPath)));
-        commands.add(String.format("-class=%s",LogParser.getTargetClass(logPaths, Integer.parseInt(properties.getProperty("frame.level")))));
+        commands.add(String.format("-projectCP=%s",getDependencies(libs)));
+        commands.add(String.format("-class=%s",LogParser.getTargetClass(logPaths, Integer.parseInt(frameLevel))));
 
 
         EvoSuite evosuite = new EvoSuite();
@@ -111,16 +126,12 @@ public class EvocrashPluginExtension {
         }
     }
 
-    private void addProperty(String commandName, String propertyName){
-        commands.add(String.format("-D%s=%s",commandName,properties.getProperty(propertyName)));
+    private void addProperty(String commandName, String property){
+        commands.add(String.format("-D%s=%s",commandName,property));
     }
 
-    private void addProperty(String name){
-        addProperty(name,name);
-    }
-
-    private void addOptionalProperty(String commandName, String propertyName){
-        Optional.ofNullable(properties.getProperty(propertyName)).filter(command -> ! command.isEmpty()).ifPresent(command -> addProperty(commandName,command));
+    private void addOptionalProperty(String commandName, String property){
+        Optional.ofNullable(property).filter(command -> ! command.isEmpty()).ifPresent(command -> addProperty(commandName,command));
     }
 
     /**
@@ -144,27 +155,6 @@ public class EvocrashPluginExtension {
         return dep.substring(0, dep.length() - 1);
     }
 
-    private void loadProperties(){
-        properties = new Properties();
-        InputStream input = null;
-
-        try {
-            input = new FileInputStream(CONFIG_PATH);
-            // load a properties file
-            properties.load(input);
-
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        } finally {
-            if (input != null) {
-                try {
-                    input.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
 
     private void checkIfDirectoryExists(String directoryPath){
         if(! new File(directoryPath).exists()){

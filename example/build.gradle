@@ -1,0 +1,9 @@
+buildscript {
+
+    dependencies {
+        classpath files('/home/mael/stamp/wp3/EvoCrash-demo/Demo/evocrash-lib/evocrash-1.0.0.jar')
+        classpath files('/home/mael/stamp/wp3/evocrash-plugin/build/libs/evocrash-plugin-1.0.0-SNAPSHOT.jar')			
+    }
+}
+
+apply plugin: eu.stamp_project.evocrash.EvocrashPlugin

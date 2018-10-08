@@ -14,15 +14,11 @@ buildscript {
             url "https://plugins.gradle.org/m2/"
         }
     }
-    dependencies {
-        classpath "com.github.jengelman.gradle.plugins:shadow:4.0.1"
-    }
 }
 
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'java-gradle-plugin'
-apply plugin: "com.github.johnrengelman.shadow"
 
 dependencies {
     compile files('evocrash-lib/evocrash-1.0.0.jar')
@@ -37,12 +33,6 @@ gradlePlugin {
         }
     }
 }
-
-shadowJar {
-    zip64 true
-    classifier = null
-}
-
 
 
 

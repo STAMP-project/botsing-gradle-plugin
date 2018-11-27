@@ -14,22 +14,26 @@ buildscript {
             url "https://plugins.gradle.org/m2/"
         }
     }
+    dependencies{
+        classpath 'com.github.jengelman.gradle.plugins:shadow:4.0.2'
+    }
 }
 
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'java-gradle-plugin'
+apply plugin: 'com.github.johnrengelman.shadow'
 
 dependencies {
-    compile files('evocrash-lib/evocrash-1.0.0.jar')
+    compile 'eu.stamp-project:botsing-reproduction:1.0.1'
     compile group: 'org.projectlombok', name: 'lombok', version: '1.18.2'
 }
 
 gradlePlugin {
     plugins {
         evocrash {
-            id = 'eu.stamp_project.evocrash'
-            implementationClass = 'eu.stamp_project.evocrash.EvocrashPlugin'
+            id = 'eu.stamp_project.botsing'
+            implementationClass = 'eu.stamp_project.botsing.BotsingGradlePlugin'
         }
     }
 }

@@ -1,9 +1,14 @@
 buildscript {
 
     dependencies {
-        classpath files('/home/mael/stamp/wp3/EvoCrash-demo/Demo/evocrash-lib/evocrash-1.0.0.jar')
-        classpath files('/home/mael/stamp/wp3/evocrash-plugin/build/libs/evocrash-plugin-1.0.0-SNAPSHOT.jar')			
+        classpath files('/home/mael/stamp/wp3/botsing-plugin/build/libs/botsing-plugin-1.0.0-SNAPSHOT-all.jar')
     }
 }
 
-apply plugin: eu.stamp_project.evocrash.EvocrashPlugin
+apply plugin: eu.stamp_project.botsing.BotsingGradlePlugin
+
+botsing {
+	logPath="src/main/resources/Fraction.log"
+	libsPath="src/main/resources/Fraction_libraries.jar"
+ 	output="result/"	
+}

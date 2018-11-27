@@ -1,7 +1,5 @@
 # Gradle plugin for Evocrash
 
-## EvoCrash github repository: https://github.com/STAMP-project/EvoCrash
-
 ## Build the plugin
 
 ```./gradlew shadowJar```
@@ -17,7 +15,7 @@ It will generate a test from Fraction.log and Fraction_libraries.jar in the resu
 
 ## Configure the plugin
 
-The plugin can be configured by modifying the file example/build.gradle. For more information about parameters, check [Botsing repository](https://github.com/stamp-project/botsing).
+The plugin can be configured by modifying the file example/build.gradle. For more information about parameters, check the [Botsing repository](https://github.com/stamp-project/botsing).
 
 #### Required parameters
 
@@ -28,6 +26,6 @@ The plugin can be configured by modifying the file example/build.gradle. For mor
 #### Optional parameters
 
  - The `output` parameter enables to choose where the output will be generated.
- - The searchBudget parameter enables to specify an additional parameter in format.
- - The population parameter
+ - The `searchBudget` parameter enables to specify an additional parameter in format.
+ - The `population` parameter
 

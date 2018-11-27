@@ -8,7 +8,9 @@ buildscript {
 apply plugin: eu.stamp_project.botsing.BotsingGradlePlugin
 
 botsing {
-	logPath="src/main/resources/Fraction.log"
+
+    //required parameters
+    logPath="src/main/resources/Fraction.log"
 	libsPath="src/main/resources/Fraction_libraries.jar"
- 	output="result/"	
+    targetFrame="1"
 }

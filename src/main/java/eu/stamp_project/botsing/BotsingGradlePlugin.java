@@ -11,7 +11,7 @@ public class BotsingGradlePlugin implements Plugin<Project> {
 	    BotsingGradlePluginExtension extension = project.getExtensions().create("botsing", BotsingGradlePluginExtension.class);
 
 	    project.task("botsing").doLast(task -> {
-	        extension.listProperties();
+	        extension.checkProperties();
 			try {
 				 extension.create();
 			}catch (Exception e){

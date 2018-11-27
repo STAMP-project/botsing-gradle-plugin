@@ -15,14 +15,21 @@ import lombok.Setter;
 
 public class BotsingGradlePluginExtension {
 
+    //Required parameters
     @Getter @Setter
-    private String output ="result/";
+    private String logPath = null;
     @Getter @Setter
-    private String logPath ="src/main/resources/Fraction.logPath";
+    private String libsPath =null;
     @Getter @Setter
-    private String libsPath ="src/main/resources/Fraction_libraries.jar";
+    private String targetFrame = null;
+
+    //Optional parameters
     @Getter @Setter
-    private String frameLevel="1";
+    private String output= null;
+    @Getter @Setter
+    private String searchBudget= null;
+    @Getter @Setter
+    private String population= null;
 
 
     private List<String> commands;
@@ -31,31 +38,34 @@ public class BotsingGradlePluginExtension {
         commands = new ArrayList<>();
     }
 
-    public void listProperties(){
+    public void checkProperties(){
 
-        System.out.println("Project libraries will be taken in the directory: "+ libsPath);
-        System.out.println("The logPath file: "+ logPath +" will be taken");
-        System.out.println("The output will be generated in the directory: " + output);
+        System.out.println("The following parameters will be used: ");
+        checkRequiredParameterContent("logPath",logPath);
+        checkIfDirectoryExists(logPath);
+        checkRequiredParameterContent("libsPath",libsPath);
+        checkIfDirectoryExists(libsPath);
+        checkRequiredParameterContent("targetFrame",targetFrame);
+
+        displayOptionalParameterIfNotNull("output",output);
+        Optional.ofNullable(output).ifPresent(path -> checkIfDirectoryExists(path));
+        displayOptionalParameterIfNotNull("searchBudget",searchBudget);
+        displayOptionalParameterIfNotNull("population",population);
     }
 
     public void create() {
 
-        checkIfDirectoryExists(output);
-        checkIfDirectoryExists(libsPath);
-        checkIfDirectoryExists(logPath);
-
         String logPath = this.logPath;
 
         //required parameters
-        addRequiredParameter("target_frame",frameLevel);
+        addRequiredParameter("target_frame", targetFrame);
         addRequiredParameter("crash_log",logPath);
-
-        System.out.println(String.format("Commands used without dependencies and class: %s",commands.toString()));
         addRequiredParameter("projectCP", libsPath);
 
         //optional parameters
-        commands.add(String.format("-Dtest_dir=%s",Paths.get(output).toString()));
-        commands.add(String.format("-Drandom_seed=%s",1));
+        Optional.ofNullable(output).ifPresent(value -> commands.add(String.format("-Dtest_dir=%s",Paths.get(output).toString())));
+        Optional.ofNullable(searchBudget).ifPresent(val -> commands.add(String.format("-Dsearch_budget=%s",searchBudget)));
+        Optional.ofNullable(population).ifPresent(val -> commands.add(String.format("-Dpopulation=%s",population)));
 
         System.out.println(commands);
 
@@ -107,4 +117,12 @@ public class BotsingGradlePluginExtension {
         }
     }
 
+    private void checkRequiredParameterContent(String parameterName, String parameter){
+        System.out.println(String.format(" - %s: %s",parameterName, Optional.ofNullable(parameter)
+                .orElseThrow(() -> new RuntimeException(String.format("Impossible to run Botsing, %s is not set",parameterName)))));
+    }
+
+    private void displayOptionalParameterIfNotNull(String parameterName, String parameter){
+        Optional.ofNullable(parameter).ifPresent(content -> System.out.println(String.format("%s: %s",parameterName,content)));
+    }
 }

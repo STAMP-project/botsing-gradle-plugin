@@ -1,4 +1,4 @@
-# Gradle plugin for Evocrash
+# Gradle plugin for Botsing
 
 ## Build the plugin
 

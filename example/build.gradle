@@ -1,7 +1,7 @@
 buildscript {
 
     dependencies {
-        classpath files('/home/mael/stamp/wp3/botsing-plugin/build/libs/botsing-plugin-1.0.0-SNAPSHOT-all.jar')
+        classpath files('../build/libs/botsing-gradle-plugin-1.0.0-SNAPSHOT-all.jar')
     }
 }
 

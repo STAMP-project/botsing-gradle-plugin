@@ -21,7 +21,7 @@ The plugin can be configured by modifying the file example/build.gradle. For mor
 
  - The `logPath` parameter should contain the path to the log.
  - The `libsPath` parameter should contain the path to the classes.
- - The `targetFrame` paramater should target the frame to reproduce. This number should be between 1 and the number of frames in the stack trace.
+ - The `targetFrame` parameter should target the frame to reproduce. This number should be between 1 and the number of frames in the stack trace.
 
 #### Optional parameters
 

@@ -24,8 +24,12 @@ apply plugin: 'maven'
 apply plugin: 'java-gradle-plugin'
 apply plugin: 'com.github.johnrengelman.shadow'
 
+shadowJar {
+  zip64 true
+}
+
 dependencies {
-    compile 'eu.stamp-project:botsing-reproduction:1.0.1'
+    compile 'eu.stamp-project:botsing-reproduction:1.0.3'
     compile group: 'org.projectlombok', name: 'lombok', version: '1.18.2'
 }
 

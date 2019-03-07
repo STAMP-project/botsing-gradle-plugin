@@ -59,8 +59,6 @@ public class BotsingGradlePluginExtension {
 
     public void create(Project project) {
 
-        String logPath = this.logPath;
-
         //required parameters
         addRequiredParameter("target_frame", targetFrame);
         addRequiredParameter("crash_log", logPath);
@@ -73,10 +71,14 @@ public class BotsingGradlePluginExtension {
                 .ifPresent(val -> commands.add(String.format("-Dsearch_budget=%s", searchBudget)));
         Optional.ofNullable(population).ifPresent(val -> commands.add(String.format("-Dpopulation=%s", population)));
 
-        System.out.println("commands : " + commands);
+        String[] args = commands.toArray(new String[0]);
+
+        for (int i =0 ;i<args.length;i++) {
+            System.out.println("commands : " + args[i]);
+        }
 
         try {
-            new Botsing().parseCommandLine(commands.toArray(new String[0]));
+            new Botsing().parseCommandLine(args);
         } catch (Throwable e) {
             System.out.println("An error happened while running Botsing: " + e.getMessage());
             throw new RuntimeException(e);
@@ -116,7 +118,8 @@ public class BotsingGradlePluginExtension {
                         .map(File::getAbsolutePath)
                         .filter(file -> file.endsWith(".jar"))
                         .collect(Collectors.joining(File.pathSeparator)))
-                .collect(Collectors.joining(File.pathSeparator));
+                .collect(Collectors.joining(File.pathSeparator))
+                .substring(1);
 
     }
 }

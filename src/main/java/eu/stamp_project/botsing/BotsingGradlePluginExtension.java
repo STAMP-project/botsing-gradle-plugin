@@ -8,13 +8,19 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.gradle.api.Project;
+import org.gradle.api.artifacts.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import eu.stamp.botsing.Botsing;
 import lombok.Getter;
 import lombok.Setter;
 
 
 public class BotsingGradlePluginExtension {
+
+    private static Logger logger = LoggerFactory.getLogger(BotsingRunner.class.getName());
+
+    private final String botsingConfigName = "botsingConfig";
 
     //Required parameters
     @Getter
@@ -46,7 +52,7 @@ public class BotsingGradlePluginExtension {
 
     public void checkProperties() {
 
-        System.out.println("The following parameters will be used: ");
+        logger.info("The following parameters will be used: ");
         checkRequiredParameterContent("logPath", logPath);
         checkIfDirectoryExists(logPath);
         checkRequiredParameterContent("targetFrame", targetFrame);
@@ -74,13 +80,14 @@ public class BotsingGradlePluginExtension {
         String[] args = commands.toArray(new String[0]);
 
         for (int i =0 ;i<args.length;i++) {
-            System.out.println("commands : " + args[i]);
+            logger.debug("commands : " + args[i]);
         }
 
         try {
-            new Botsing().parseCommandLine(args);
+            File botsingReproductionJar = addBotsingDependencies(project);
+            BotsingRunner.executeBotsing(project.getBuildDir(), botsingReproductionJar, commands);
         } catch (Throwable e) {
-            System.out.println("An error happened while running Botsing: " + e.getMessage());
+            logger.error("An error happened while running Botsing: " + e.getMessage());
             throw new RuntimeException(e);
         }
     }
@@ -97,7 +104,7 @@ public class BotsingGradlePluginExtension {
     }
 
     private void checkRequiredParameterContent(String parameterName, String parameter) {
-        System.out.println(String.format(" - %s: %s",
+        logger.info(String.format(" - %s: %s",
                 parameterName,
                 Optional.ofNullable(parameter)
                         .orElseThrow(() -> new RuntimeException(String.format("Impossible to run Botsing, %s is not set",
@@ -106,13 +113,14 @@ public class BotsingGradlePluginExtension {
 
     private void displayOptionalParameterIfNotNull(String parameterName, String parameter) {
         Optional.ofNullable(parameter)
-                .ifPresent(content -> System.out.println(String.format("%s: %s", parameterName, content)));
+                .ifPresent(content -> logger.info(String.format("%s: %s", parameterName, content)));
     }
 
     private String getDependencies(Project project) {
 
         return project.getConfigurations()
                 .stream()
+                .filter(configuration -> ! configuration.getName().equals(botsingConfigName))
                 .map(configuration -> configuration.resolve()
                         .stream()
                         .map(File::getAbsolutePath)
@@ -121,5 +129,14 @@ public class BotsingGradlePluginExtension {
                 .collect(Collectors.joining(File.pathSeparator))
                 .substring(1);
 
+    }
+
+    private File addBotsingDependencies(Project project){
+        Configuration botsingConfig = project.getConfigurations().create(botsingConfigName);
+        botsingConfig.getDependencies().add(project.getDependencies().create("eu.stamp-project:botsing-reproduction:1.0.4"));
+        return project.getConfigurations().getByName(botsingConfigName).resolve()
+                .stream()
+                .collect(Collectors.toList())
+                .get(0);
     }
 }

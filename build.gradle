@@ -26,40 +26,10 @@ apply plugin: 'com.github.johnrengelman.shadow'
 
 shadowJar {
   zip64 true
-
-  relocate 'org.objectweb.asm', 'org.evosuite.shaded.org.objectweb.asm'
-  relocate 'org.hibernate', 'org.evosuite.shaded.org.hibernate'
-  relocate 'org.hsqldb', 'org.evosuite.shaded.org.hsqldb'
-  relocate 'org.jboss', 'org.evosuite.shaded.org.jboss'
-  relocate 'org.springframework', 'org.evosuite.shaded..org.springframework'
-  relocate 'org.apache.commons.logging', 'org.evosuite.shaded.org.apache.commons.logging'
-  relocate 'javassist', 'org.evosuite.shaded.javassist'
-  relocate 'antlr', 'org.evosuite.shaded.antlr'
-  relocate 'org.antlr', 'org.evosuite.shaded.org.antlr'
-  relocate 'org.dom4j', 'org.evosuite.shaded.org.dom4j'
-  relocate 'org.aopalliance', 'org.evosuite.shaded.org.aopalliance'
-  relocate 'org.mockito', 'org.evosuite.shaded.org.mockito'
-  relocate 'net.bytebuddy', 'org.evosuite.shaded.net.bytebuddy'
-  relocate 'javax.servlet', 'org.evosuite.shaded.javax.servlet'
-  relocate 'org.hamcrest', 'org.evosuite.shaded.org.hamcrest'
-  relocate 'org.objenesis', 'org.evosuite.shaded.org.objenesis'
-  relocate 'be.vibes', 'org.evosuite.shaded.be.vibes'
-  relocate 'be.yami', 'org.evosuite.shaded.be.yami'
-  relocate 'com.google', 'org.evosuite.shaded.com.google'
-  relocate('org.apache','org.evosuite.shaded.org.apache'){
-	exclude 'org.apache.tools.ant.taskdefs.optional.junit.JUnitResultFormatter'
-	exclude 'org.apache.tools.ant.taskdefs.optional.junit.JUnitTest'
-	exclude 'org.apache.tools.ant.BuildException'
-	exclude 'org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor'
-  }
-
-  relocate 'org.projectlombok', 'shaded.org.projectlombok'
-  relocate 'eu.stamp-project', 'org.evosuite.shaded.eu.stamp-project'
-
 }
 
 dependencies {
-    compile 'eu.stamp-project:botsing-reproduction:1.0.3'
+    //compile 'eu.stamp-project:botsing-reproduction:1.0.3'
     compile group: 'org.projectlombok', name: 'lombok', version: '1.18.2'
 }
 

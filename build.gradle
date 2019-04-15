@@ -1,4 +1,6 @@
+group = 'eu.stamp_project'
 project.version = '1.0.0-SNAPSHOT'
+
 
 repositories {
     if (project.hasProperty('local')) {
@@ -35,8 +37,8 @@ dependencies {
 
 gradlePlugin {
     plugins {
-        evocrash {
-            id = 'eu.stamp_project.botsing'
+        botsing {
+            id = 'eu.stamp_project.botsing-gradle-plugin'
             implementationClass = 'eu.stamp_project.botsing.BotsingGradlePlugin'
         }
     }

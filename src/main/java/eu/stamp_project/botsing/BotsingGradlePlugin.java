@@ -2,8 +2,10 @@ package eu.stamp_project.botsing;
 
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-import org.gradle.api.artifacts.Configuration;
 
+import lombok.extern.log4j.Log4j;
+
+@Log4j
 public class BotsingGradlePlugin implements Plugin<Project> {
 
     @Override
@@ -18,7 +20,7 @@ public class BotsingGradlePlugin implements Plugin<Project> {
             try {
                 extension.create(project);
             } catch (Exception e) {
-                System.err.println("An exception occured during the generation: \n" + e.getMessage());
+                log.error("An exception occured during the generation: \n" + e.getMessage());
             }
         });
 

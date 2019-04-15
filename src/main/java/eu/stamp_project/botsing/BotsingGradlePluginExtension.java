@@ -9,16 +9,14 @@ import java.util.stream.Collectors;
 
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.log4j.Log4j;
 
 
+@Log4j
 public class BotsingGradlePluginExtension {
-
-    private static Logger logger = LoggerFactory.getLogger(BotsingRunner.class.getName());
 
     private final String botsingConfigName = "botsingConfig";
 
@@ -38,6 +36,10 @@ public class BotsingGradlePluginExtension {
 
     @Getter
     @Setter
+    private String botsingVersion = null;
+
+    @Getter
+    @Setter
     private String searchBudget = null;
 
     @Getter
@@ -52,7 +54,7 @@ public class BotsingGradlePluginExtension {
 
     public void checkProperties() {
 
-        logger.info("The following parameters will be used: ");
+        log.info("The following parameters will be used: ");
         checkRequiredParameterContent("logPath", logPath);
         checkIfDirectoryExists(logPath);
         checkRequiredParameterContent("targetFrame", targetFrame);
@@ -61,6 +63,7 @@ public class BotsingGradlePluginExtension {
         Optional.ofNullable(output).ifPresent(path -> checkIfDirectoryExists(path));
         displayOptionalParameterIfNotNull("searchBudget", searchBudget);
         displayOptionalParameterIfNotNull("population", population);
+        displayOptionalParameterIfNotNull("botsingVersion", botsingVersion);
     }
 
     public void create(Project project) {
@@ -77,17 +80,15 @@ public class BotsingGradlePluginExtension {
                 .ifPresent(val -> commands.add(String.format("-Dsearch_budget=%s", searchBudget)));
         Optional.ofNullable(population).ifPresent(val -> commands.add(String.format("-Dpopulation=%s", population)));
 
-        String[] args = commands.toArray(new String[0]);
-
-        for (int i =0 ;i<args.length;i++) {
-            logger.debug("commands : " + args[i]);
+        if (log.isDebugEnabled()){
+            commands.stream().peek(command -> log.debug(String.format("Command : %s",command)));
         }
 
         try {
             File botsingReproductionJar = addBotsingDependencies(project);
             BotsingRunner.executeBotsing(project.getBuildDir(), botsingReproductionJar, commands);
         } catch (Throwable e) {
-            logger.error("An error happened while running Botsing: " + e.getMessage());
+            log.error("An error happened while running Botsing: " + e.getMessage());
             throw new RuntimeException(e);
         }
     }
@@ -104,16 +105,19 @@ public class BotsingGradlePluginExtension {
     }
 
     private void checkRequiredParameterContent(String parameterName, String parameter) {
-        logger.info(String.format(" - %s: %s",
-                parameterName,
+        displayParameter(parameterName,
                 Optional.ofNullable(parameter)
                         .orElseThrow(() -> new RuntimeException(String.format("Impossible to run Botsing, %s is not set",
-                                parameterName)))));
+                                parameterName))));
     }
 
     private void displayOptionalParameterIfNotNull(String parameterName, String parameter) {
         Optional.ofNullable(parameter)
-                .ifPresent(content -> logger.info(String.format("%s: %s", parameterName, content)));
+                .ifPresent(content -> displayParameter(parameterName,content));
+    }
+
+    private void displayParameter(String parameterName, String parameter){
+        log.info(String.format("- %s: %s", parameterName, parameter));
     }
 
     private String getDependencies(Project project) {
@@ -132,8 +136,12 @@ public class BotsingGradlePluginExtension {
     }
 
     private File addBotsingDependencies(Project project){
+        final String defaultBotsingVersion = "1.0.4";
+        final String mavenRef = "eu.stamp-project:botsing-reproduction:" + Optional.ofNullable(botsingVersion)
+                .orElse(defaultBotsingVersion);
+
         Configuration botsingConfig = project.getConfigurations().create(botsingConfigName);
-        botsingConfig.getDependencies().add(project.getDependencies().create("eu.stamp-project:botsing-reproduction:1.0.4"));
+        botsingConfig.getDependencies().add(project.getDependencies().create(mavenRef));
         return project.getConfigurations().getByName(botsingConfigName).resolve()
                 .stream()
                 .collect(Collectors.toList())

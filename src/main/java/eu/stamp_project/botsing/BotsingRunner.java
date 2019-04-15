@@ -7,13 +7,10 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.log4j.Log4j;
 
-
+@Log4j
 public class BotsingRunner {
-
-	private static Logger logger = LoggerFactory.getLogger(BotsingRunner.class.getName());
 
 	public static boolean executeBotsing(File basedir, File botsingReproductionJar, List<String> properties)
 			throws InterruptedException, IOException {
@@ -21,7 +18,7 @@ public class BotsingRunner {
 		final String JAVA_CMD = System.getProperty("java.home") + File.separatorChar + "bin" + File.separatorChar
 				+ "java";
 
-		ArrayList<String> jarCommand = new ArrayList<String>();
+		ArrayList<String> jarCommand = new ArrayList<>();
 		jarCommand.add(JAVA_CMD);
 		jarCommand.add("-jar");
 
@@ -47,10 +44,10 @@ public class BotsingRunner {
 			int exitCode = process.waitFor();
 
 			if (exitCode != 0) {
-				logger.error("Error executing botsing-reproduction");
+				log.error("Error executing botsing-reproduction");
 				return false;
 			} else {
-				logger.debug("botsing-reproduction terminated");
+				log.debug("botsing-reproduction terminated");
 			}
 
 		} catch (InterruptedException e) {
@@ -63,7 +60,7 @@ public class BotsingRunner {
 					process.getErrorStream().close();
 
 				} catch (Exception t) {
-					logger.error("Failed to close process stream: " + t.toString());
+					log.error("Failed to close process stream: " + t.toString());
 				}
 
 				process.destroy();
@@ -87,16 +84,16 @@ public class BotsingRunner {
 					while (!this.isInterrupted()) {
 						String line = in.readLine();
 						if (line != null && !line.isEmpty()) {
-							logger.info(line);
+							log.info(line);
 						}
 					}
 				} catch (Exception e) {
-					logger.debug("Exception while reading spawn process output: " + e.toString());
+					log.debug("Exception while reading spawn process output: " + e.toString());
 				}
 			}
 		};
 
 		reader.start();
-		logger.debug("Started thread to read spawn process output");
+		log.debug("Started thread to read spawn process output");
 	}
 }

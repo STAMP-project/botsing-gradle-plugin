@@ -93,7 +93,7 @@ public class BotsingGradlePluginExtension {
 
         try {
             File botsingReproductionJar = addBotsingDependencies(project);
-            BotsingRunner.executeBotsing(project.getBuildDir(), botsingReproductionJar, commands);
+            BotsingRunner.executeBotsing(new File(output), botsingReproductionJar, commands);
         } catch (Throwable e) {
             log.error("An error happened while running Botsing: " + e.getMessage());
             throw new RuntimeException(e);

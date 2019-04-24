@@ -5,6 +5,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -85,7 +86,7 @@ public class BotsingGradlePluginExtension {
     public void create(Project project) {
 
         //required parameters
-        addRequiredParameter("target_frame", targetFrame);
+        int targetFrameIndex = addRequiredParameter("target_frame", targetFrame);
         addRequiredParameter("crash_log", logPath);
         addRequiredParameter("project_cp", getDependencies(project));
 
@@ -102,16 +103,32 @@ public class BotsingGradlePluginExtension {
 
         try {
             File botsingReproductionJar = addBotsingDependencies(project);
-            BotsingRunner.executeBotsing(new File(output), botsingReproductionJar, commands);
+
+            boolean successfulGeneration = false;
+
+            while (! successfulGeneration && getNextTargetFrame(targetFrameIndex)>= 0){
+                log.info(String.format("Running Botsing with target frame=%s.",commands.get(targetFrameIndex)));
+                successfulGeneration = BotsingRunner.executeBotsing(new File(output), botsingReproductionJar, commands);
+                commands.add(targetFrameIndex,Integer.toString(getNextTargetFrame(targetFrameIndex)));
+            }
+
+
         } catch (Throwable e) {
             log.error("An error happened while running Botsing: " + e.getMessage());
             throw new GradleException(e.getMessage());
         }
     }
 
-    private void addRequiredParameter(String parameter, String value) {
+    /**
+     * Add the required parameter and its value and return the index of the value
+     * @param parameter is the parameter name that will be added
+     * @param value is the value of the parameter
+     * @return the index of the value
+     */
+    private int addRequiredParameter(String parameter, String value) {
         commands.add(String.format("-%s", parameter));
         commands.add(value);
+        return commands.size()-1;
     }
 
     private File checkIfDirectoryExists(String directoryPath) {
@@ -193,5 +210,9 @@ public class BotsingGradlePluginExtension {
         File botsingFile =  new ArrayList<>(botsingConfig.resolve()).get(0);
 
         return botsingFile;
+    }
+
+    private int getNextTargetFrame(int targetFrameIndex){
+        return Integer.parseInt(commands.get(targetFrameIndex))-1;
     }
 }

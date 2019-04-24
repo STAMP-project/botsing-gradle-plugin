@@ -1,16 +1,34 @@
 buildscript {
+    repositories {
+        if (project.hasProperty('local')) mavenLocal()
+	jcenter()
+    }
 
     dependencies {
-        classpath files('../build/libs/botsing-gradle-plugin-1.0.0-SNAPSHOT-all.jar')
+         classpath "eu.stamp_project:botsing-gradle-plugin:1.0.0-SNAPSHOT"
     }
 }
 
+group="eu.stamp_project"
+version="1.0.0"
+
 apply plugin: eu.stamp_project.botsing.BotsingGradlePlugin
+
+allprojects {       
+    repositories {
+        if (project.hasProperty('local')) mavenLocal()
+	jcenter()
+    }       
+} 
 
 botsing {
 
     //required parameters
-    logPath="src/main/resources/Fraction.log"
-	libsPath="src/main/resources/Fraction_libraries.jar"
+    logPath="/home/mael/stamp/wp3/botsing-gradle-plugin/example/src/main/resources/Fraction.log"
     targetFrame="1"
+    localArtifacts=["/home/mael/stamp/wp3/botsing-gradle-plugin/example/src/main/resources/Fraction_libraries.jar"]
+
+    //optional parameters
+    botsingVersion="1.0.2"
+    output="/tmp/test/"
 }

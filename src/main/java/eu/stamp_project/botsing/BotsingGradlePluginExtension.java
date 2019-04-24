@@ -4,11 +4,14 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.gradle.api.GradleException;
+import org.gradle.api.InvalidUserDataException;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 
@@ -48,7 +51,11 @@ public class BotsingGradlePluginExtension {
 
     @Getter
     @Setter
-    private List<String> artifacts = null;
+    private List<String> mavenArtifacts = null;
+
+    @Getter
+    @Setter
+    private List<String> localArtifacts = null;
 
     private List<String> commands;
 
@@ -70,7 +77,9 @@ public class BotsingGradlePluginExtension {
         displayOptionalParameterIfNotNull("searchBudget", searchBudget);
         displayOptionalParameterIfNotNull("population", population);
         displayOptionalParameterIfNotNull("botsingVersion", botsingVersion);
-        displayOptionalListParameterIfNotNull("artifacts",artifacts);
+        displayOptionalListParameterIfNotNull("mavenArtifacts",mavenArtifacts);
+        displayOptionalListParameterIfNotNull("localArtifacts",localArtifacts);
+
     }
 
     public void create(Project project) {
@@ -96,7 +105,7 @@ public class BotsingGradlePluginExtension {
             BotsingRunner.executeBotsing(new File(output), botsingReproductionJar, commands);
         } catch (Throwable e) {
             log.error("An error happened while running Botsing: " + e.getMessage());
-            throw new RuntimeException(e);
+            throw new GradleException(e.getMessage());
         }
     }
 
@@ -105,16 +114,19 @@ public class BotsingGradlePluginExtension {
         commands.add(value);
     }
 
-    private void checkIfDirectoryExists(String directoryPath) {
-        if (!new File(directoryPath).exists()) {
-            throw new RuntimeException(String.format("Bad path %s", directoryPath));
+    private File checkIfDirectoryExists(String directoryPath) {
+        File file = new File(directoryPath);
+        if (file.exists()) {
+            return file;
+        }else {
+            throw new InvalidUserDataException(String.format("Bad path %s", directoryPath));
         }
     }
 
     private void checkRequiredParameterContent(String parameterName, String parameter) {
         displayParameter(parameterName,
                 Optional.ofNullable(parameter)
-                        .orElseThrow(() -> new RuntimeException(String.format("Impossible to run Botsing, %s is not set",
+                        .orElseThrow(() -> new InvalidUserDataException(String.format("Impossible to run Botsing, %s is not set",
                                 parameterName))));
     }
 
@@ -126,7 +138,7 @@ public class BotsingGradlePluginExtension {
     private void displayOptionalListParameterIfNotNull(String parameterName, List<String> listParameter){
         Optional.ofNullable(listParameter)
                 .ifPresent(content -> {
-                    String formattedList = content.stream().map(artifact -> String.format("\n %s",artifact)).collect(Collectors.joining(","));
+                    String formattedList = content.stream().map(artifact -> String.format("\n\t%s",artifact)).collect(Collectors.joining(","));
                     log.info(String.format("- %s: [%s]", parameterName, formattedList));
                 });
     }
@@ -136,35 +148,50 @@ public class BotsingGradlePluginExtension {
     }
 
     private String getDependencies(Project project) {
+
+        Set<File> jarFiles = new HashSet<>();
+        if(mavenArtifacts != null){
+            jarFiles.addAll(resolveMavenDependencies(project));
+        }
+        if(localArtifacts != null){
+            jarFiles.addAll(localArtifacts.stream().map(artifact -> checkIfDirectoryExists(artifact)).collect(Collectors.toSet()));
+        }
+
+        return jarFiles.stream()
+                .map(File::getAbsolutePath)
+                .filter(file -> file.endsWith(".jar"))
+                .collect(Collectors.joining(File.pathSeparator));
+    }
+
+    private Set<File> resolveMavenDependencies(Project project){
+
         final String projectMavenName = "projectMavenConfig";
         Configuration projectMavenConfig = project.getConfigurations().create(projectMavenName);
 
         // Take the artifact provided by the user otherwise use the current version of the project and download it from maven
-        List<String> projectMavenRef = Optional.ofNullable(artifacts)
+        List<String> projectMavenRef = Optional.ofNullable(mavenArtifacts)
                 .orElse(Collections.singletonList(String.format("%s:%s:%s",project.getGroup(),project.getName(),project.getVersion())));
 
         projectMavenRef.forEach(ref -> projectMavenConfig.getDependencies()
                 .add(project.getDependencies().create(ref)));
 
         //Resolve the configuration and download the files
-        Set<File> jarFiles = projectMavenConfig.resolve();
-
-        return jarFiles.stream()
-                .map(File::getAbsolutePath)
-                .filter(file -> file.endsWith(".jar"))
-                .peek(file -> log.info("file "+file))
-                .collect(Collectors.joining(File.pathSeparator));
+        return projectMavenConfig.resolve();
     }
 
     // Download botsing and add it as a dependency to the current artifact
     private File addBotsingDependencies(Project project){
-        final String botsingConfigName = "botsingConfig";
+
+        final String botsingConfigName = "botsing";
         final String defaultBotsingVersion = "1.0.4";
         final String mavenRef = "eu.stamp-project:botsing-reproduction:" + Optional.ofNullable(botsingVersion)
                 .orElse(defaultBotsingVersion);
-
+        
         Configuration botsingConfig = project.getConfigurations().create(botsingConfigName);
         botsingConfig.getDependencies().add(project.getDependencies().create(mavenRef));
-        return new ArrayList<>(project.getConfigurations().getByName(botsingConfigName).resolve()).get(0);
+
+        File botsingFile =  new ArrayList<>(botsingConfig.resolve()).get(0);
+
+        return botsingFile;
     }
 }

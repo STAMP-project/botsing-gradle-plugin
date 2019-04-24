@@ -107,12 +107,13 @@ public class BotsingGradlePluginExtension {
             File botsingReproductionJar = addBotsingDependencies(project);
 
             boolean successfulGeneration = false;
+            File executiveDirectory = Optional.ofNullable(output).map(File::new).orElse(project.getProjectDir());
 
             long timeout = Optional.ofNullable(searchBudget).map(budget -> Long.parseLong(budget)*2).orElse(defaultTimeout);
 
             while (! successfulGeneration && getNextTargetFrame(targetFrameIndex)>= 0){
                 log.info(String.format("Running Botsing with target frame=%s.",commands.get(targetFrameIndex)));
-                successfulGeneration = BotsingRunner.executeBotsing(new File(output),timeout,botsingReproductionJar, commands);
+                successfulGeneration = BotsingRunner.executeBotsing(executiveDirectory,timeout,botsingReproductionJar, commands);
                 commands.add(targetFrameIndex,Integer.toString(getNextTargetFrame(targetFrameIndex)));
             }
 

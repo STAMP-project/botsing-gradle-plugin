@@ -24,11 +24,10 @@ allprojects {
 botsing {
 
     //required parameters
-    logPath="/home/mael/stamp/wp3/botsing-gradle-plugin/example/src/main/resources/Fraction.log"
+    logPath="/home/mael/stamp/wp3/botsing-gradle-plugin/example/localJar/src/main/resources/Fraction.log"
     targetFrame="1"
-    localArtifacts=["/home/mael/stamp/wp3/botsing-gradle-plugin/example/src/main/resources/Fraction_libraries.jar"]
+    localArtifacts=["/home/mael/stamp/wp3/botsing-gradle-plugin/example/localJar/src/main/resources/Fraction_libraries.jar"]
 
     //optional parameters
-    botsingVersion="1.0.2"
-    output="/tmp/test/"
+    botsingVersion="1.0.4"
 }

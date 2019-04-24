@@ -1,0 +1,47 @@
+buildscript {
+    repositories {
+        if (project.hasProperty('local')) mavenLocal()
+	jcenter()
+	maven { url 'http://repository.activeeon.com/content/groups/proactive/' }
+    }
+
+    dependencies {
+         classpath "eu.stamp_project:botsing-gradle-plugin:1.0.0-SNAPSHOT"
+    }
+}
+
+apply plugin: eu.stamp_project.botsing.BotsingGradlePlugin
+
+allprojects {       
+    repositories {
+        if (project.hasProperty('local')) mavenLocal()
+	jcenter()
+	maven { url 'http://repository.activeeon.com/content/groups/proactive/' }
+    }       
+} 
+
+botsing {
+
+    //required parameters
+    logPath="/home/mael/stamp/wp3/botsing-gradle-plugin/example/mavenJar/SpaceNotFound.log"
+    targetFrame="4"
+    mavenArtifacts=["org.ow2.proactive:common-api:8.4.1",
+    "org.ow2.proactive:common-client:8.4.1",
+    "org.ow2.proactive:common-db:8.4.1",
+    "org.ow2.proactive:common-http:8.4.1",
+    "org.ow2.proactive:scheduler-api:8.4.1",
+    "org.ow2.proactive:scheduler-client:8.4.1",
+    "org.ow2.proactive:scheduler-examples:8.4.1",
+    "org.ow2.proactive:scheduler-node:8.4.1",
+    "org.ow2.proactive:scheduler-smartproxy:8.4.1",
+    "org.ow2.proactive:scheduler-smartproxy-common:8.4.1",
+    "org.ow2.proactive:scheduler-server:8.4.1",
+    "org.ow2.proactive:rm-client:8.4.1",
+    "org.ow2.proactive:rm-node:8.4.1",
+    "org.ow2.proactive:rm-node-updater:8.4.1",
+    "org.ow2.proactive:rm-server:8.4.1"]
+
+    //optional parameters
+    botsingVersion="1.0.4"
+    searchBudget="60"
+}

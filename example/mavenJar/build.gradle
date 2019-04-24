@@ -23,7 +23,7 @@ allprojects {
 botsing {
 
     //required parameters
-    logPath="/home/mael/stamp/wp3/botsing-gradle-plugin/example/mavenJar/SpaceNotFound.log"
+    logPath="SpaceNotFound.log"
     targetFrame="4"
     mavenArtifacts=["org.ow2.proactive:common-api:8.4.1",
     "org.ow2.proactive:common-client:8.4.1",

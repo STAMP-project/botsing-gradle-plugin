@@ -6,13 +6,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import lombok.extern.log4j.Log4j;
 
 @Log4j
 public class BotsingRunner {
 
-	public static boolean executeBotsing(File basedir, File botsingReproductionJar, List<String> properties)
+	public static boolean executeBotsing(File basedir, long timeout, File botsingReproductionJar, List<String> properties)
 			throws InterruptedException, IOException {
 
 		final String JAVA_CMD = System.getProperty("java.home") + File.separatorChar + "bin" + File.separatorChar
@@ -26,10 +27,10 @@ public class BotsingRunner {
 
 		jarCommand.addAll(properties);
 
-		return BotsingRunner.executeProcess(basedir, jarCommand.toArray(new String[0]));
+		return BotsingRunner.executeProcess(basedir,timeout,jarCommand.toArray(new String[0]));
 	}
 
-	public static boolean executeProcess(File workDir, String... command) throws InterruptedException, IOException {
+	public static boolean executeProcess(File workDir,long timeout, String... command) throws InterruptedException, IOException {
 		Process process = null;
 
 		try {
@@ -41,9 +42,9 @@ public class BotsingRunner {
 			process = builder.start();
 			handleProcessOutput(process);
 
-			int exitCode = process.waitFor();
+			boolean exitResult = process.waitFor(timeout, TimeUnit.SECONDS);
 
-			if (exitCode != 0) {
+			if (! exitResult) {
 				log.error("Error executing botsing-reproduction");
 				return false;
 			} else {

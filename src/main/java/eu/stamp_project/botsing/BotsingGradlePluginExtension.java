@@ -5,7 +5,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -85,6 +84,9 @@ public class BotsingGradlePluginExtension {
 
     public void create(Project project) {
 
+        //default timeout for each botsing execution is 1200s.
+        final long defaultTimeout = 1200L;
+
         //required parameters
         int targetFrameIndex = addRequiredParameter("target_frame", targetFrame);
         addRequiredParameter("crash_log", logPath);
@@ -106,9 +108,11 @@ public class BotsingGradlePluginExtension {
 
             boolean successfulGeneration = false;
 
+            long timeout = Optional.ofNullable(searchBudget).map(budget -> Long.parseLong(budget)*2).orElse(defaultTimeout);
+
             while (! successfulGeneration && getNextTargetFrame(targetFrameIndex)>= 0){
                 log.info(String.format("Running Botsing with target frame=%s.",commands.get(targetFrameIndex)));
-                successfulGeneration = BotsingRunner.executeBotsing(new File(output), botsingReproductionJar, commands);
+                successfulGeneration = BotsingRunner.executeBotsing(new File(output),timeout,botsingReproductionJar, commands);
                 commands.add(targetFrameIndex,Integer.toString(getNextTargetFrame(targetFrameIndex)));
             }
 

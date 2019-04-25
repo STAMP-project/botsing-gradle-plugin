@@ -5,7 +5,7 @@ buildscript {
     }
 
     dependencies {
-         classpath "eu.stamp_project:botsing-gradle-plugin:2.0.0"
+         classpath "eu.stamp-project:botsing-gradle-plugin:2.0.0"
     }
 }
 

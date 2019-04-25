@@ -5,12 +5,9 @@ buildscript {
     }
 
     dependencies {
-         classpath "eu.stamp_project:botsing-gradle-plugin:1.0.0-SNAPSHOT"
+         classpath "eu.stamp_project:botsing-gradle-plugin:2.0.0"
     }
 }
-
-group="eu.stamp_project"
-version="1.0.0"
 
 apply plugin: eu.stamp_project.botsing.BotsingGradlePlugin
 

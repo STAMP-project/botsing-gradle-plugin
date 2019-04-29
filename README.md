@@ -13,7 +13,7 @@
 ### Example using local jar
 
 ```
-$ ./gradlew install```
+$ ./gradlew install
 $ cd example/localJar/
 $ ./gradlew botsing -Plocal --info
 ```
@@ -23,12 +23,12 @@ It will generate a test from Fraction.log and Fraction_libraries.jar. The genera
 ### Example using local jar
 
 ```
-$ ./gradlew install```
+$ ./gradlew install
 $ cd example/mavenJar/
 $ ./gradlew botsing -Plocal --info
 ```
 
-It will generate a test from SpaceNotFound.log and Scheduling project libraries uploaded on maven. The test generated test can be found in the directory `crash-reproduction-tests/`.
+It will generate a test from SpaceNotFound.log and Scheduling project libraries uploaded on maven. The generated test can be found in the directory `crash-reproduction-tests/`.
 
 ## Configure the plugin
 

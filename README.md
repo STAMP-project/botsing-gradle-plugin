@@ -20,7 +20,7 @@ $ ./gradlew botsing -Plocal --info
 
 It will generate a test from Fraction.log and Fraction_libraries.jar. The generated test can be found in the directory `crash-reproduction-tests/`.
 
-### Example using local jar
+### Example using Maven jar
 
 ```
 $ ./gradlew install

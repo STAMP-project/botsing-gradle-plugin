@@ -1,5 +1,5 @@
 group = 'eu.stamp-project'
-project.version = '2.0.0'
+version = '2.0.0'
 
 buildscript {
     repositories {
@@ -12,8 +12,9 @@ repositories {
 }
 
 apply plugin: 'java'
-apply plugin: 'maven'
+apply plugin: 'maven-publish'
 apply plugin: 'java-gradle-plugin'
+apply plugin: 'signing'
 
 dependencies {
     compile group: 'org.projectlombok', name: 'lombok', version: '1.18.2'
@@ -28,10 +29,63 @@ gradlePlugin {
     }
 }
 
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allJava
+}
 
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
 
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+	    artifactId = 'botsing-gradle-plugin'
 
+            from components.java
+	    artifact sourcesJar
+            artifact javadocJar
+	    
+            pom {
+                name = 'Botsing gradle plugin'
+                description = 'A gradle plugin to execute botsing using build.grade as a configuration file'
+                url = 'http://github.com/stamp-project/botsing-gradle-plugin'
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'MaelAudren'
+                        name = 'Mael Audren de Kerdrel'
+                        email = 'mael.audren@activeeon.com'
+                    }
+                }
+		scm {
+                    url = 'https://github.com/STAMP-project/botsing-gradle-plugin'
+                    connection = 'scm:git:git://github.com:STAMP-project/botsing-gradle-plugin.git'
+                    developerConnection = 'scm:git:git@github.com:STAMP-project/botsing-gradle-plugin.git'
+                }
+            }
+        }
+    }		
+    repositories {
+        maven {
+            def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+            def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots"
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+	    credentials {
+	        username "${System.getProperty('nexusUsername')}"
+		password "${System.getProperty('nexusPassword')}"
+	    }
+        }
+    }
+}
 
-
-
-
+signing {
+    sign publishing.publications.mavenJava
+}
